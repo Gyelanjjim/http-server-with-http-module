@@ -73,9 +73,7 @@ const httpRequestListener =  function(request, response){
                 }));
             });
         // url이 /posts/signup 이면 게시글 입력을 실행:
-        }
-        /*
-        else if(url === "/posts/signup"){
+        }else if(url === "/posts/signup"){
             let body = "";
 
             //콜백함수: 데이터를 모아서 하나의 스트링으로
@@ -104,7 +102,6 @@ const httpRequestListener =  function(request, response){
                     "posts" : posts }));
             });
         }
-        */
     }
 }
 
