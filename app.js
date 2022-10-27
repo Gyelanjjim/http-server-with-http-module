@@ -37,9 +37,32 @@ const httpRequestListener = function (request, response) { // (3)
 */
 const httpRequestListener =  function(request, response){
     const { url, method } = request;
-
-    if(method === "POST"){
-        //response.writeHead(200, {'Content-Type':'appliction/json'})
+    if (method === 'GET'){
+        if (url === '/ping'){
+            response.writeHead(200, {'Content-Type' : 'appliction/json'});
+            response.end(JSON.stringify({message : 'pong'}));
+        }else if (url === '/posts/inquire'){
+            const data = [];
+            for(let i = 0; i<posts.length; i++){
+                for(let j = 0; j<users.length; j++){
+                    if (users[j].id === posts[i].userId){
+                        let userPost = {
+                            "userID"           : users[j].id,
+                            "userName"         : users[j].name,
+                            "postingId"        : posts[i].id,
+                            "postingTitle"     : posts[i].title,
+                            "postingContent"   : posts[i].content 
+                        }
+                        data.push(userPost);
+                    }
+                }
+            }
+            console.log(data);    
+            response.writeHead(200, {'Content-Type' : 'appliction/json'});
+            response.end(JSON.stringify({ "data" : data }));
+        }
+    }else if(method === "POST"){
+        response.writeHead(200, {'Content-Type':'appliction/json'})
         //response.end(JSON.stringify({message: 'userCreated'}));
         // url이 /users/signup 이면 회원가입을 실행:
         if (url === "/users/signup") {
@@ -91,7 +114,7 @@ const httpRequestListener =  function(request, response){
                     id: post.id,
                     title: post.title,
                     content: post.content,
-                    userId: post.userId
+                    userId: post.userId,
                 });
                 // 데이터타입은 json으로 
                 response.writeHead(200, {'Content-Type':'appliction/json'});
