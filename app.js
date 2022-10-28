@@ -29,12 +29,26 @@ const posts = [
       userId: 1,
     },
 ];
-/*
-const httpRequestListener = function (request, response) { // (3)
-    response.writeHead(200, { "Content-Type": "application/json" }); // (4)
-    response.end(JSON.stringify({ message: "userCreated" })); // (5)
-  };
-*/
+
+const data = function(){
+    let dataArray = [];
+    for(let i = 0; i<posts.length; i++){
+        for(let j = 0; j<users.length; j++){
+            if (users[j].id === posts[i].userId){
+                let userPost = {
+                    "userID"           : users[j].id,
+                    "userName"         : users[j].name,
+                    "postingId"        : posts[i].id,
+                    "postingTitle"     : posts[i].title,
+                    "postingContent"   : posts[i].content 
+                }
+                dataArray.push(userPost);
+            }
+        }
+    }
+    return dataArray;
+}
+
 const httpRequestListener =  function(request, response){
     const { url, method } = request;
     if (method === 'GET'){
@@ -42,28 +56,11 @@ const httpRequestListener =  function(request, response){
             response.writeHead(200, {'Content-Type' : 'appliction/json'});
             response.end(JSON.stringify({message : 'pong'}));
         }else if (url === '/posts/inquire'){
-            const data = [];
-            for(let i = 0; i<posts.length; i++){
-                for(let j = 0; j<users.length; j++){
-                    if (users[j].id === posts[i].userId){
-                        let userPost = {
-                            "userID"           : users[j].id,
-                            "userName"         : users[j].name,
-                            "postingId"        : posts[i].id,
-                            "postingTitle"     : posts[i].title,
-                            "postingContent"   : posts[i].content 
-                        }
-                        data.push(userPost);
-                    }
-                }
-            }
-            console.log(data);    
             response.writeHead(200, {'Content-Type' : 'appliction/json'});
-            response.end(JSON.stringify({ "data" : data }));
+            response.end(JSON.stringify({ "data" : data() }));
         }
     }else if(method === "POST"){
-        response.writeHead(200, {'Content-Type':'appliction/json'})
-        //response.end(JSON.stringify({message: 'userCreated'}));
+        //response.writeHead(200, {'Content-Type':'appliction/json'})
         // url이 /users/signup 이면 회원가입을 실행:
         if (url === "/users/signup") {
             let body = "";
@@ -104,9 +101,9 @@ const httpRequestListener =  function(request, response){
                 body += data;
             });
 
-            //콜백함수: 
+            //콜백함수: 요청의 body(end)에 대해 실행하겠다?
             request.on("end", ()=>{
-                // 하나의 스트링으로 만든 body를 파싱해서 post에 할당
+                // 스트링 body를 JSON형태로 파싱해서 post에 할당
                 const post = JSON.parse(body);
 
                  // 전역변수 posts에 입력받은 객체를 추가
@@ -125,9 +122,43 @@ const httpRequestListener =  function(request, response){
                     "posts" : posts }));
             });
         }
+    }else if(method === "PATCH"){
+        if(url === '/posts/change'){
+            let body = "";
+            
+            //콜백함수: 터미널에 입력된 데이터를 모아서 하나의 스트링으로
+            request.on("data", (data) => { 
+                body += data;
+            });
+            
+            //콜백함수: 
+            request.on("end", ()=>{
+                // 스트링 body를 JSON형태로 파싱해서 post에 할당
+                const post = JSON.parse(body);
+
+                 // 전역변수 posts에 입력받은 객체를 수정
+                 // post에 id값이 없거나 id
+                for(let i in posts){
+                    /*if
+                    
+                    (!post.id || (!posts[i].id.includes(post.id)&& i===posts.length-1)){
+                        console.log("등록되지 않은 게시물 id입니다!");
+                    }else
+                    {*/
+                        if (posts[i].id === post.id){
+                             posts[i].content = post.content;
+                        } 
+                    /*}*/
+                }
+                
+                response.writeHead(200, {'Content-Type' : 'appliction/json'});
+                //response.end(JSON.stringify({ "posts": posts }));
+                response.end(JSON.stringify({ "data" : data() }));
+            });
+        }
+    
     }
 }
-
 server.on("request", httpRequestListener);
 
 const IP = '127.0.0.1';
