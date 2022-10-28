@@ -59,6 +59,34 @@ const subA = function(arr, num){
     return arrNew;
   }
 
+  const postFind = function (arr, idx){ // posts와 idx를 입력하면
+    let result =[];
+    for(let i=0; i<arr.length; i++){
+      if(arr[i].userId === idx){
+        result.push({
+          "postingId"       : arr[i].id,
+          "postingName"     : arr[i].title,
+          "postingContent"  : arr[i].content  
+        });
+      }
+    }
+    return result; // 이런 형태의 객체를 반환하는 함수
+  }
+  
+  const userFind = function (arr1, arr2, userId){ // users, posts, idx를 입력받으면
+    let result = {};
+    for(let i in arr1){
+      if(arr1[i].id === userId){
+        result = {
+          "userID"    : arr1[i].id,
+          "userName"  : arr1[i].name,
+          "postings"  : postFind(arr2, userId)
+        }
+      }
+    }
+    return result;
+  }
+
 const httpRequestListener =  function(request, response){
     const { url, method } = request;
     if (method === 'GET'){
@@ -68,6 +96,23 @@ const httpRequestListener =  function(request, response){
         }else if (url === '/posts/inquire'){
             response.writeHead(200, {'Content-Type' : 'appliction/json'});
             response.end(JSON.stringify({ "data" : data() }));
+        }else if (url === '/users/posts/inquire'){
+            let body = "";
+
+            request.on("data", (data) => { 
+                body += data;
+            });
+
+            request.on("end", ()=>{
+                const user = JSON.parse(body);
+                
+                let result={}; 
+                result = userFind(users, posts, user.id); 
+                
+                response.writeHead(200, {'Content-Type':'appliction/json'});
+                response.end(JSON.stringify({"data" : result}));
+            });
+            
         }
     }else if(method === "POST"){
         //response.writeHead(200, {'Content-Type':'appliction/json'})
@@ -147,7 +192,7 @@ const httpRequestListener =  function(request, response){
                     if (posts[i].id === post.id){
                          posts[i].content = post.content;
                     } 
-                    /*}*/
+                    
                 }
                 
                 response.writeHead(200, {'Content-Type' : 'appliction/json'});
