@@ -15,7 +15,7 @@ const users = [
     },
 ];
   
-const posts = [
+let posts = [
     {
       id: 1,
       title: "간단한 HTTP API 개발 시작!",
@@ -48,6 +48,16 @@ const data = function(){
     }
     return dataArray;
 }
+// 입력받은 배열arr의 키id가 입력받은 num과 같으면 그 요소를 제거하고 나머지를 배열로 반환하는 함수
+const subA = function(arr, num){
+    arrNew =[];
+    for(let i=0; i<arr.length; i++){
+        if(arr[i].id!==num){
+            arrNew.push(arr[i]);
+        }
+    }
+    return arrNew;
+  }
 
 const httpRequestListener =  function(request, response){
     const { url, method } = request;
@@ -126,37 +136,41 @@ const httpRequestListener =  function(request, response){
         if(url === '/posts/change'){
             let body = "";
             
-            //콜백함수: 터미널에 입력된 데이터를 모아서 하나의 스트링으로
             request.on("data", (data) => { 
                 body += data;
             });
             
-            //콜백함수: 
             request.on("end", ()=>{
-                // 스트링 body를 JSON형태로 파싱해서 post에 할당
                 const post = JSON.parse(body);
 
-                 // 전역변수 posts에 입력받은 객체를 수정
-                 // post에 id값이 없거나 id
                 for(let i in posts){
-                    /*if
-                    
-                    (!post.id || (!posts[i].id.includes(post.id)&& i===posts.length-1)){
-                        console.log("등록되지 않은 게시물 id입니다!");
-                    }else
-                    {*/
-                        if (posts[i].id === post.id){
-                             posts[i].content = post.content;
-                        } 
+                    if (posts[i].id === post.id){
+                         posts[i].content = post.content;
+                    } 
                     /*}*/
                 }
                 
                 response.writeHead(200, {'Content-Type' : 'appliction/json'});
-                //response.end(JSON.stringify({ "posts": posts }));
                 response.end(JSON.stringify({ "data" : data() }));
             });
         }
     
+    }else if(method === "DELETE"){
+        if(url === '/posts/delete'){
+            let body = "";
+
+            request.on("data", (data) => { 
+                body += data;
+            });
+            request.on("end", ()=>{
+                const post = JSON.parse(body);
+                
+                posts = subA(posts, post.id);
+                response.writeHead(200, {'Content-Type' : 'appliction/json'});
+                response.end(JSON.stringify({ "message" : "postingDeleted", "posts" : posts }));
+            });
+            
+        }
     }
 }
 server.on("request", httpRequestListener);
