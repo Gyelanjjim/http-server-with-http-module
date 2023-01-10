@@ -1,7 +1,7 @@
 # http-server-with-http-module
 
 ## 주제📈
-간단한 CRUD API서버 만들기
+NodeJS의 내장 모듈인 HTTP를 활용하여 간단한 CRUD API서버 만들기
 
 ## 기간📆
 2022.10.26 ~ 2022.10.28
