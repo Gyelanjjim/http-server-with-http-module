@@ -48,7 +48,7 @@ const data = function(){
     }
     return dataArray;
 }
-// 입력받은 배열arr의 키id가 입력받은 num과 같으면 그 요소를 제거하고 나머지를 배열로 반환하는 함수
+
 const subA = function(arr, num){
     arrNew =[];
     for(let i=0; i<arr.length; i++){
@@ -59,7 +59,7 @@ const subA = function(arr, num){
     return arrNew;
   }
 
-  const postFind = function (arr, idx){ // posts와 idx를 입력하면
+  const postFind = function (arr, idx){ 
     let result =[];
     for(let i=0; i<arr.length; i++){
       if(arr[i].userId === idx){
@@ -70,10 +70,10 @@ const subA = function(arr, num){
         });
       }
     }
-    return result; // 이런 형태의 객체를 반환하는 함수
+    return result; 
   }
   
-  const userFind = function (arr1, arr2, userId){ // users, posts, idx를 입력받으면
+  const userFind = function (arr1, arr2, userId){ 
     let result = {};
     for(let i in arr1){
       if(arr1[i].id === userId){
@@ -115,22 +115,16 @@ const httpRequestListener =  function(request, response){
             
         }
     }else if(method === "POST"){
-        //response.writeHead(200, {'Content-Type':'appliction/json'})
-        // url이 /users/signup 이면 회원가입을 실행:
         if (url === "/users/signup") {
             let body = "";
 
-            //콜백함수: 데이터를 모아서 하나의 스트링으로
             request.on("data", (data) => { 
                 body += data;
             });
 
-            //콜백함수: 
             request.on("end", ()=>{
-                // 하나의 스트링으로 만든 body를 파싱해서 user에 할당
                 const user = JSON.parse(body);
 
-                // 전역변수 users에 입력받은 객체를 추가
                 users.push({
                     id: user.id,
                     name: user.name,
@@ -138,40 +132,32 @@ const httpRequestListener =  function(request, response){
                     password: user.password,
                 });
 
-                // 데이터타입은 json으로 
                 response.writeHead(200, {'Content-Type':'appliction/json'});
 
-                // json으로 작성된 stringify(...)의 ...을 응답'body'에 표시
                 response.end(JSON.stringify({
                     message : "userCreated",
                     "users" : users
                 }));
             });
-        // url이 /posts/signup 이면 게시글 입력을 실행:
         }else if(url === "/posts/signup"){
             let body = "";
 
-            //콜백함수: 데이터를 모아서 하나의 스트링으로
             request.on("data", (data) => { 
                 body += data;
             });
 
-            //콜백함수: 요청의 body(end)에 대해 실행하겠다?
             request.on("end", ()=>{
-                // 스트링 body를 JSON형태로 파싱해서 post에 할당
                 const post = JSON.parse(body);
 
-                 // 전역변수 posts에 입력받은 객체를 추가
                 posts.push({
                     id: post.id,
                     title: post.title,
                     content: post.content,
                     userId: post.userId,
                 });
-                // 데이터타입은 json으로 
+
                 response.writeHead(200, {'Content-Type':'appliction/json'});
 
-                // json으로 작성된 stringify()의 객체 내용을 응답'body'에 표시
                 response.end(JSON.stringify({
                     message : "postCreated",
                     "posts" : posts }));
